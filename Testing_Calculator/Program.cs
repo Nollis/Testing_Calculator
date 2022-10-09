@@ -1,4 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using System.Globalization;
 using System.Text;
 using static Testing_Calculator.CustomExceptions;
 
@@ -7,14 +8,19 @@ decimal intOne = 0;
 decimal intTwo = 0;
 string operand = "";
 ConsoleKeyInfo status;
+decimal[] arr = new decimal[20];
+Calculations c = new Calculations();
 
 
 while (keepAlive)
 {
     decimal result = 0;
     decimal resultA = 0;
+    int counter = 1;
     var divZero = false;
     var operandT = true;
+    var moreValues = true;
+
     while (operandT)
     {
         Console.Write("Enter type of calculation +,-,*,/.");
@@ -43,6 +49,8 @@ while (keepAlive)
     try
     {
         intOne = Convert.ToDecimal(Console.ReadLine() ?? "");
+        arr[0] = intOne;
+        
     }
     catch (FormatException ex)
     {
@@ -87,24 +95,65 @@ while (keepAlive)
     {
         Console.Write("Enter second integer:");
         intTwo = Convert.ToDecimal(Console.ReadLine() ?? "");
+        arr[1] = intTwo;
     }
 
-    decimal[] arr = { intOne, intTwo };
+    if (operand == "+" || operand == "-")
+    {
+        while (moreValues)
+        {   
+            Console.WriteLine("Do you want to add more numbers? (Y/y)");
+            status = Console.ReadKey();
 
-    Calculations c = new Calculations();
+            if (status.Key == ConsoleKey.Y)
+            {
+                counter++;
+                moreValues = true;
+                Console.Write("Add another value:");
+                try
+                {
+                    arr[counter] = Convert.ToDecimal(Console.ReadLine() ?? "");
+                }
+                catch (FormatException ex)
+                {
+                    Console.WriteLine($"Error: {ex:Message}");
+                    Console.ReadKey();
+                    Console.Clear();
+                }
+            }
+            else
+            {
+                moreValues = false;
+            }
+        }
+
+    }
 
     switch (operand)
     {
         case "+":
-            result = c.Addition(intOne, intTwo);
-            resultA = c.Addition(arr);
+            
+            if (counter > 0 )
+            {
+                result = c.Addition(arr);
+            }
+            else
+            {
+                result = c.Addition(intOne, intTwo);
+            }
             break;
         case "*":
             result = c.Multiply(intOne, intTwo);
             break;
         case "-":
-            result = c.Subtract(intOne, intTwo);
-            resultA = c.Subtract(arr);
+            if (counter > 0)
+            {
+                result = c.Subtract(arr);
+            }
+            else
+            {
+                result = c.Subtract(intOne, intTwo);
+            }
             break;
         case "/":
             result = c.Divide(intOne, intTwo);
@@ -112,50 +161,62 @@ while (keepAlive)
         default:
             break;
     }
-    Console.ResetColor();
+
+    Console.Clear();
     Console.WriteLine("The result is {0}", result);
-    Console.WriteLine("Array result is {0}", resultA);
+
     Console.WriteLine("Do you want to quit? (Y/y)");
     status = Console.ReadKey();
+    
     if (status.Key == ConsoleKey.Y)
     {
         keepAlive = false;
         break;
     }
+
+    Array.Clear(arr, 0, arr.Length);
     Console.Clear();
 }
 
 public class Calculations
 {
+    decimal Result;
     public decimal Addition(decimal param1, decimal param2)
     {
-        decimal Result = param1 + param2;
+        Result = param1 + param2;      
         return Result;
     }
     public decimal Addition(decimal[] arr)
     {
-        decimal Result = arr[0] + arr[1];
+        for (int i = 0; i < arr.Length; i++)
+        {
+            Result += arr[i];
+        }
         return Result;
     }
     public decimal Multiply(decimal param1, decimal param2)
     {
-        decimal Result = param1 * param2;
+        Result = param1 * param2;
         return Result;
     }
     public decimal Subtract(decimal param1, decimal param2)
     {
-        decimal Result = param1 - param2;
+        Result = param1 - param2;
         return Result;
     }
 
     public decimal Subtract(decimal[] arr)
     {
-        decimal Result = arr[0] - arr[1];
+        Result = arr[0];
+        for (int i = 1; i < arr.Length; i++)
+        {
+            Result -= arr[i];
+        }
         return Result;
     }
     public decimal Divide(decimal param1, decimal param2)
     {
-        decimal Result = param1 / param2;
+        Result = param1 / param2;
         return Result;
     }
 
